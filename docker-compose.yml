@@ -1,0 +1,25 @@
+services:
+  mcp_watchdog:
+    container_name: mcp_watchdog
+
+    build:
+      context: .
+      dockerfile: dockerfile
+
+    restart: unless-stopped 
+
+    command: ["python3", "-u", "main.py"]
+ 
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+
+
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+      
+    networks:
+      - web
+
+networks:
+  web:
+    external: true
