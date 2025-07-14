@@ -19,20 +19,20 @@ services:
 
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.mcp_watchdog.rule=Host(`status.huzaifairfan.com`)"
+      - "traefik.http.routers.health_status_dashboard.rule=Host(`status.huzaifairfan.com`)"
 
-      - "traefik.http.routers.mcp_watchdog.entrypoints=websecure"
-      - "traefik.http.routers.mcp_watchdog.tls=true"
-      - "traefik.http.routers.mcp_watchdog.tls.certresolver=le"
+      - "traefik.http.routers.health_status_dashboard.entrypoints=websecure"
+      - "traefik.http.routers.health_status_dashboard.tls=true"
+      - "traefik.http.routers.health_status_dashboard.tls.certresolver=le"
       
-      # - "traefik.http.services.mcp_watchdog.loadbalancer.server.port=3000"
-      # - "traefik.http.services.mcp_watchdog.loadbalancer.server.scheme=http"
+      # - "traefik.http.services.health_status_dashboard.loadbalancer.server.port=3000"
+      # - "traefik.http.services.health_status_dashboard.loadbalancer.server.scheme=http"
 
-      - "traefik.http.services.mcp_watchdog.loadbalancer.server.url=http://mcp_watchdog:8000"
+      - "traefik.http.services.health_status_dashboard.loadbalancer.server.url=http://health_status_dashboard:8000"
      
     networks:
       - web
-      - mcp_watchdog
+      - health_status_dashboard
 
     depends_on:
       - redis
@@ -47,7 +47,7 @@ services:
     depends_on:
       - redis
     networks:
-      - mcp_watchdog
+      - health_status_dashboard
 
   beat:
     build: .
@@ -60,15 +60,15 @@ services:
     environment:
       - CELERY_ENABLE_UTC=true
     networks:
-      - mcp_watchdog
+      - health_status_dashboard
   redis:
     image: redis:7-alpine
     container_name: redis-broker
     networks:
-      - mcp_watchdog
+      - health_status_dashboard
 
 networks:
-  mcp_watchdog:
+  health_status_dashboard:
     driver: bridge
   web:
     external: true
