@@ -1,5 +1,5 @@
 [project]
-name = "mcp-watchdog"
+name = "container-health-status"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"

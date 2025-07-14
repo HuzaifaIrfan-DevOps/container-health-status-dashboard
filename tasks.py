@@ -1,5 +1,5 @@
 from celery_worker import celery
-from watchdog import get_unhealthy_containers, restart_container
+from docker_utils import get_unhealthy_containers, restart_container
 
 @celery.task
 def restart_unhealthy_containers():

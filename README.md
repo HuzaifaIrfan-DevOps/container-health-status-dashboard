@@ -1,5 +1,5 @@
 <div align="center">
-  <h1>MCP-Watchdog</h1>
+  <h1>Container Health Status Dashboard</h1>
   <h3 align="center">Docker Container Health Status and Celery Task to Restart Unhealthy Containers 🚀</h3>
 </div>
 

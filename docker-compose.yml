@@ -1,6 +1,6 @@
 services:
-  mcp_watchdog:
-    container_name: mcp_watchdog
+  health_status_dashboard:
+    container_name: health_status_dashboard
 
     build:
       context: .
