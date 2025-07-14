@@ -15,17 +15,19 @@ RUN apt-get update && apt-get install -y \
     apt-get install -y docker-ce-cli && \
     apt-get clean
 
-# Install uv for package management
-RUN pip install --no-cache-dir python-on-whales
-# uv
 
 WORKDIR /app
 
-ADD . /app
+# Install uv for package management
+RUN pip install --no-cache-dir uv
+# uv
+
+COPY ./pyproject.toml .
 
 # Install Packages
-# RUN uv sync
+RUN uv sync
+
+COPY . .
 
 
-# Run
-CMD ["python3", "-u", "main.py"]
+CMD ["uv", "run", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]

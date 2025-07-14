@@ -7,8 +7,6 @@ services:
       dockerfile: dockerfile
 
     restart: unless-stopped 
-
-    command: ["python3", "-u", "main.py"]
  
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
@@ -16,10 +14,61 @@ services:
 
     extra_hosts:
       - "host.docker.internal:host-gateway"
+ 
+
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.mcp_watchdog.rule=Host(`status.huzaifairfan.com`)"
+
+      - "traefik.http.routers.mcp_watchdog.entrypoints=websecure"
+      - "traefik.http.routers.mcp_watchdog.tls=true"
+      - "traefik.http.routers.mcp_watchdog.tls.certresolver=le"
       
+      # - "traefik.http.services.mcp_watchdog.loadbalancer.server.port=3000"
+      # - "traefik.http.services.mcp_watchdog.loadbalancer.server.scheme=http"
+
+      - "traefik.http.services.mcp_watchdog.loadbalancer.server.url=http://mcp_watchdog:8000"
+     
     networks:
       - web
+      - mcp_watchdog
+
+    depends_on:
+      - redis
+
+
+  worker:
+    build: .
+    container_name: celery-worker
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: uv run celery -A celery_worker worker --loglevel=info
+    depends_on:
+      - redis
+    networks:
+      - mcp_watchdog
+
+  beat:
+    build: .
+    container_name: celery-beat
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      - redis
+    command: uv run celery -A celery_worker beat --loglevel=info
+    environment:
+      - CELERY_ENABLE_UTC=true
+    networks:
+      - mcp_watchdog
+  redis:
+    image: redis:7-alpine
+    container_name: redis-broker
+    networks:
+      - mcp_watchdog
 
 networks:
+  mcp_watchdog:
+    driver: bridge
   web:
     external: true

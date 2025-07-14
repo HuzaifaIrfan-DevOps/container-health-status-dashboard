@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Docker Container Health</title>
+    <style>
+        body { font-family: Arial; padding: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+        .healthy { background-color: #c8facc; }
+        .unhealthy { background-color: #ffc9c9; }
+        .none { background-color: #e0e0e0; }
+    </style>
+</head>
+<body>
+    <h1>🚦 Docker Container Health Status</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>ID</th>
+                <th>Status</th>
+                <th>Started At</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for c in containers %}
+            <tr class="{{ c.status }}">
+                <td>{{ c.name }}</td>
+                <td>{{ c.id }}</td>
+                <td>{{ c.status }}</td>
+                <td>{{ c.started }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

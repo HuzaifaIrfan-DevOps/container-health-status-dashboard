@@ -1,19 +1,29 @@
+from fastapi import FastAPI, Request
+from fastapi.responses import HTMLResponse
+from fastapi.templating import Jinja2Templates
 from python_on_whales import docker
-import time
+from datetime import datetime
 
-CHECK_INTERVAL = 30  # seconds
+app = FastAPI()
+templates = Jinja2Templates(directory="templates")
 
-def check_and_restart():
-    containers = docker.ps(all=True)
-    print(containers)
-    for container in containers:
-        health_status = container.state.health.status if container.state.health else None
-        if health_status == "unhealthy":
-            print(f"🔁 Restarting unhealthy container: {container.name} ({container.id[:12]})")
-            docker.restart(container)
+def get_container_status():
+    data = []
+    for container in docker.ps(all=True):
+        health = container.state.health.status if container.state.health else "none"
+        started = container.state.started_at
+        data.append({
+            "name": container.name,
+            "id": container.id[:12],
+            "status": health,
+            "started": started.strftime("%Y-%m-%d %H:%M:%S") if started else "N/A"
+        })
+    return data
 
-if __name__ == "__main__":
-    print("🐍🐳 Watchdog using python-on-whales started...")
-    while True:
-        check_and_restart()
-        time.sleep(CHECK_INTERVAL)
+@app.get("/", response_class=HTMLResponse)
+async def status_page(request: Request):
+    containers = get_container_status()
+    return templates.TemplateResponse("status.html", {
+        "request": request,
+        "containers": containers
+    })
